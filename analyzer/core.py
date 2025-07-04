@@ -80,7 +80,7 @@ def create_reports(filepath):
             full_report['analysis'].update(summary)
 
         # Build summary text
-         summary_text = f"📄 File: {filename}\n"
+        summary_text = f"📄 File: {filename}\n"
         summary_text += f"🧾 Type: {mime_type}\n"
         imports = full_report['analysis'].get('imports', [])
         summary_text += f"📥 Imports: {', '.join(imports) if imports else 'None'}\n"
