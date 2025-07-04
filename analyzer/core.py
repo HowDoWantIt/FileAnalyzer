@@ -80,9 +80,20 @@ def create_reports(filepath):
             full_report['analysis'].update(summary)
 
         # Build summary text
-        summary_text = f"📄 File: {filename}\n"
+         summary_text = f"📄 File: {filename}\n"
         summary_text += f"🧾 Type: {mime_type}\n"
         imports = full_report['analysis'].get('imports', [])
         summary_text += f"📥 Imports: {', '.join(imports) if imports else 'None'}\n"
         summary_text += f"🌐 Uses Internet: {full_report['analysis'].get('uses_internet', False)}\n"
         summary_text += f"🗂 File Operations: {full_report['analysis'].get('file_operations', 'None')}\n"
+        summary_text += f"⚠️ Heuristic Flags: {', '.join(full_report['analysis'].get('heuristic_flags', [])) if full_report['analysis'].get('heuristic_flags') else 'None'}\n"
+
+        full_report['summary'] = summary_text
+
+        return full_report
+
+    except Exception as e:
+        return {
+            'summary': f'❌ Error processing file: {e}',
+            'full': full_report
+        }
