@@ -66,12 +66,13 @@ def create_reports(filepath):
         elif filename.lower().endswith('.docx'):
             content = extract_docx(filepath)
         elif filename.lower().endswith('.exe'):
+            # تحلیل فایل اجرایی
             pe_info = analyze_pe(filepath)
             full_report['analysis']['pe_info'] = pe_info
             content = ""
         else:
             return {
-                'summary': f'⚠️ File type "{mime_type}" is not supported.',
+                'summary': f'⚠️ فرمت فایل {mime_type} پشتیبانی نمی‌شود.',
                 'full': full_report
             }
 
@@ -79,21 +80,34 @@ def create_reports(filepath):
             summary = analyze_content(content)
             full_report['analysis'].update(summary)
 
-        # Build summary text
-        summary_text = f"📄 File: {filename}\n"
-        summary_text += f"🧾 Type: {mime_type}\n"
+        # ساخت متن گزارش خلاصه
+        summary_text = f"📄 فایل: {filename}\n"
+        summary_text += f"🧾 نوع: {mime_type}\n"
         imports = full_report['analysis'].get('imports', [])
-        summary_text += f"📥 Imports: {', '.join(imports) if imports else 'None'}\n"
-        summary_text += f"🌐 Uses Internet: {full_report['analysis'].get('uses_internet', False)}\n"
-        summary_text += f"🗂 File Operations: {full_report['analysis'].get('file_operations', 'None')}\n"
-        summary_text += f"⚠️ Heuristic Flags: {', '.join(full_report['analysis'].get('heuristic_flags', [])) if full_report['analysis'].get('heuristic_flags') else 'None'}\n"
+        summary_text += f"📥 ایمپورت‌ها: {', '.join(imports) if imports else 'ندارد'}\n"
+        summary_text += f"🌐 استفاده از اینترنت: {full_report['analysis'].get('uses_internet', False)}\n"
+        summary_text += f"🗂 عملیات فایل: {full_report['analysis'].get('file_operations', False)}\n"
+        keywords = full_report['analysis'].get('keywords', [])
+        summary_text += f"⚠️ کلمات کلیدی: {', '.join(keywords) if keywords else 'ندارد'}\n"
+        heuristics = full_report['analysis'].get('heuristic_flags', [])
+        summary_text += f"⚠️ پرچم‌های Heuristic: {', '.join(heuristics) if heuristics else 'ندارد'}\n"
 
-        full_report['summary'] = summary_text
+        if 'pe_info' in full_report['analysis']:
+            pe = full_report['analysis']['pe_info']
+            if 'error' in pe:
+                summary_text += f"❌ خطا در تحلیل PE: {pe['error']}\n"
+            else:
+                summary_text += f"🔍 PE Entry Point: {pe.get('entry_point', 'N/A')}\n"
+                summary_text += f"🔍 PE Image Base: {pe.get('image_base', 'N/A')}\n"
+                summary_text += f"🔍 PE Sections: {', '.join(pe.get('sections', []))}\n"
 
-        return full_report
+        return {
+            'summary': summary_text,
+            'full': full_report
+        }
 
     except Exception as e:
         return {
-            'summary': f'❌ Error processing file: {e}',
+            'summary': f"خطا در خواندن فایل: {str(e)}",
             'full': full_report
         }
