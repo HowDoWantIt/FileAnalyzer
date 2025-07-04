@@ -85,4 +85,5 @@ def create_reports(filepath):
         imports = full_report['analysis'].get('imports', [])
         summary_text += f"📥 Imports: {', '.join(imports) if imports else 'None'}\n"
         summary_text += f"🌐 Uses Internet: {full_report['analysis'].get('uses_internet', False)}\n"
-        summary_text += f"🗂 File Operations: {full_report['analysis'].get('file
+        summary_text += f"🗂 File Operations: {full_report['analysis'].get('file_operations', 'Unknown')}\n"
+
